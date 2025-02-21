@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Get Date
         id: get-date
@@ -31,13 +31,13 @@ jobs:
           pip3 install --upgrade buildozer
 
       - name: Cache Buildozer global
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.buildozer
           key: buildozer-global-${{ hashFiles('buildozer.spec') }}
 
       - name: Cache Buildozer
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: .buildozer
           key: buildozer-${{ hashFiles('buildozer.spec') }}
@@ -55,13 +55,13 @@ jobs:
           ls -l bin/ || echo "No bin directory found."
 
       - name: Upload Build Log
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: build-log
           path: buildozer.log
 
       - name: Upload APK
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: android-apk
           path: bin/*.apk
