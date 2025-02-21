@@ -17,18 +17,23 @@ jobs:
         run: echo "date=$(date -u "+%Y%m%d")" >> $GITHUB_ENV
 
       - name: Check buildozer.spec
-        run: cat buildozer.spec || echo "buildozer.spec not found!"
+        run: |
+          if [ ! -f buildozer.spec ]; then
+            echo "Error: buildozer.spec not found!"
+            exit 1
+          fi
 
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y python3-pip
+          apt update
+          apt install -y python3-pip openjdk-17-jdk
           pip3 install --upgrade Cython virtualenv
+          pip3 install --upgrade buildozer
 
       - name: Cache Buildozer global
         uses: actions/cache@v2
         with:
-          path: .buildozer_global
+          path: ~/.buildozer
           key: buildozer-global-${{ hashFiles('buildozer.spec') }}
 
       - name: Cache Buildozer
@@ -37,21 +42,26 @@ jobs:
           path: .buildozer
           key: buildozer-${{ hashFiles('buildozer.spec') }}
 
+      - name: Initialize Buildozer
+        run: buildozer init
+
       - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          command: android debug
-          buildozer_version: master
+        run: buildozer -v android debug | tee buildozer.log
 
       - name: Find APK file
         run: |
           echo "Looking for APK file..."
           find . -name "*.apk"
-          ls -l bin/
+          ls -l bin/ || echo "No bin directory found."
 
-      - name: Upload artifacts
+      - name: Upload Build Log
         uses: actions/upload-artifact@v2
         with:
-          name: package
-          path: bin/*.apk  # Ensure correct path
+          name: build-log
+          path: buildozer.log
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-apk
+          path: bin/*.apk
