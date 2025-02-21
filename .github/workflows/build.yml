@@ -21,9 +21,7 @@ steps:
 
 - uses: actions/checkout@v2
 
-# used to cache dependencies with a
-
-timeout
+# used to cache dependencies with a time
 
 
 name: Get Date
