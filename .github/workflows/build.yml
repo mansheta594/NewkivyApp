@@ -16,6 +16,15 @@ jobs:
         id: get-date
         run: echo "date=$(date -u "+%Y%m%d")" >> $GITHUB_ENV
 
+      - name: Check buildozer.spec
+        run: cat buildozer.spec || echo "buildozer.spec not found!"
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip
+          pip3 install --upgrade Cython virtualenv
+
       - name: Cache Buildozer global
         uses: actions/cache@v2
         with:
@@ -39,7 +48,8 @@ jobs:
         run: |
           echo "Looking for APK file..."
           find . -name "*.apk"
-      
+          ls -l bin/
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
